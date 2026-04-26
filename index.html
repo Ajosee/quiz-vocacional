@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Quiz Vocacional – Carreira e Concurso Público</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" id="app">
+    <!-- Tela inicial: nome -->
+    <div id="tela-nome" class="tela">
+      <h1>🔍 Descubra sua vocação</h1>
+      <p>Responda com sinceridade. Este quiz ajuda a identificar <strong>cursos superiores</strong> e <strong>cargos públicos</strong> compatíveis com seu perfil.</p>
+      <label for="nome">Seu nome (obrigatório):</label>
+      <input type="text" id="nome" placeholder="Ex: Khallyl Anthony" autocomplete="off">
+      <button id="btn-iniciar">👍 Começar quiz</button>
+      <p class="small">Suas respostas são anônimas – usaremos apenas para gerar seu resultado personalizado.</p>
+    </div>
+
+    <!-- Tela de perguntas (inicialmente oculta) -->
+    <div id="tela-perguntas" class="tela" style="display:none;">
+      <h2>Olá, <span id="nome-usuario"></span>!</h2>
+      <p>Responda cada pergunta com a opção que mais combina com você. Não existe resposta certa ou errada.</p>
+      <div id="pergunta-container"></div>
+      <div class="progresso">
+        <span id="progresso-texto">Questão 1 de N</span>
+        <progress id="barra-progresso" value="0" max="100"></progress>
+      </div>
+      <button id="btn-proximo" style="display:none;">Próxima ❯</button>
+      <button id="btn-concluir" style="display:none;">✨ Ver resultado final</button>
+    </div>
+
+    <!-- Tela de resultado (inicialmente oculta) -->
+    <div id="tela-resultado" class="tela" style="display:none;">
+      <h2>📊 Olá <span id="resultado-nome"></span>, com base em seu perfil:</h2>
+      <div id="resultado-cursos"></div>
+      <div id="resultado-cargos"></div>
+      <button id="btn-reiniciar">🔄 Refazer quiz</button>
+      <p class="small">* Simulação educativa. Consulte profissionais para decisões finais.</p>
+    </div>
+  </div>
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

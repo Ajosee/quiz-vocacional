@@ -1,0 +1,107 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: #0a0f1c;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 2rem;
+  min-height: 100vh;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #0f172a;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+h1, h2 {
+  color: #4caf50;
+  margin-bottom: 1rem;
+}
+label {
+  display: block;
+  margin: 1rem 0 0.5rem;
+  font-weight: bold;
+}
+input, button {
+  padding: 0.7rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+}
+input {
+  width: 100%;
+  background: #1e2a3a;
+  color: white;
+  margin-bottom: 1rem;
+}
+button {
+  background: #4caf50;
+  color: #0a0f1c;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+button:hover {
+  background: #2e7d32;
+  transform: scale(1.02);
+}
+.tela {
+  transition: 0.2s;
+}
+.pergunta {
+  background: #1e2a3a;
+  padding: 1rem;
+  border-radius: 1rem;
+  margin: 1rem 0;
+}
+.opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.opcao {
+  background: #0f172a;
+  border: 1px solid #2a3a4a;
+  border-radius: 0.5rem;
+  padding: 0.6rem;
+  cursor: pointer;
+  transition: 0.1s;
+}
+.opcao.selected {
+  background: #2a3a4a;
+  border-color: #4caf50;
+  color: #4caf50;
+}
+.progresso {
+  margin: 1rem 0;
+  text-align: center;
+}
+progress {
+  width: 100%;
+  height: 1rem;
+  border-radius: 0.5rem;
+}
+.card {
+  background: #1e2a3a;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+.card h3 {
+  color: #4caf50;
+}
+.small {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 1rem;
+}
+button#btn-reiniciar {
+  background: #ff9800;
+}
