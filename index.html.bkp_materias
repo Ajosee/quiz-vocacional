@@ -18,21 +18,6 @@
       <p class="small">Suas respostas são anônimas – usaremos apenas para gerar seu resultado personalizado.</p>
     </div>
 
-    <!-- Tela de matérias (preferências) -->
-
-    <div id="tela-materias" class="tela" style="display:none;">
-
-      <h2>📚 Preferências por disciplinas</h2>
-
-      <p>Antes de começarmos, indique o quanto você gosta de cada matéria (1 = não gosto, 5 = adoro).</p>
-
-      <div id="materias-container"></div>
-
-      <button id="btn-proximo-materias">👍 Próximo →</button>
-
-    </div>
-
-
     <!-- Tela de perguntas (inicialmente oculta) -->
     <div id="tela-perguntas" class="tela" style="display:none;">
       <h2>Olá, <span id="nome-usuario"></span>!</h2>

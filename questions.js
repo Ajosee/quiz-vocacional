@@ -43,9 +43,30 @@ const cargosPublicos = [
   { nome: "Policial Federal", perfil: { resiliencia: 9, logica: 7, atencao: 8, lideranca: 7, servico_publico: 8 }, pros: "Salário inicial acima de 12k, aposentadoria especial, atividade investigativa.", contras: "Risco físico, pressão psicológica, escalas de plantão.", salarioInicial: 12000, salarioMaximo: 20000, cargaHoraria: "40h + plantões", tempoLivre: "Médio (depende da escala)", vidaFamiliar: 6, saudavel: 5 },
   { nome: "Especialista em Políticas Públicas", perfil: { organizacao: 8, financas: 7, humanas: 7, comunicacao: 6, lideranca: 6 }, pros: "Salários bons (8-15k), trabalho técnico, impacto social.", contras: "Burocracia, concorrência alta, pouca flexibilidade.", salarioInicial: 8000, salarioMaximo: 18000, cargaHoraria: "40h/semana", tempoLivre: "Médio", vidaFamiliar: 7, saudavel: 7 },
   { nome: "Técnico Judiciário (TI)", perfil: { tecnologia: 8, logica: 7, organizacao: 7, atencao: 7, estabilidade: 9 }, pros: "Salário médio (6-10k), estabilidade, menor stress que desenvolvimento privado.", contras: "Atualização tecnológica mais lenta, burocracia.", salarioInicial: 6000, salarioMaximo: 12000, cargaHoraria: "40h/semana", tempoLivre: "Bom", vidaFamiliar: 8, saudavel: 8 },
-  { nome: "Agente da Polícia Rodoviária Federal", perfil: { resiliencia: 8, atencao: 8, logica: 6, estabilidade: 9, servico_publico: 7 }, pros: "Salário inicial 10k+ , aposentadoria especial, fiscalização e atendimento.", contras: "Condições de estrada, periculosidade, escala de turnos.", salarioInicial: 10000, salarioMaximo: 18000, cargaHoraria: "40h + plantões", tempoLivre: "Médio/baixo", vidaFamiliar: 6, saudavel: 5 }
+  { nome: "Agente da Polícia Rodoviária Federal", perfil: { resiliencia: 8, atencao: 8, logica: 6, estabilidade: 9, servico_publico: 7 }, pros: "Salário inicial 10k+, aposentadoria especial, fiscalização e atendimento.", contras: "Condições de estrada, periculosidade, escala de turnos.", salarioInicial: 10000, salarioMaximo: 18000, cargaHoraria: "40h + plantões", tempoLivre: "Médio/baixo", vidaFamiliar: 6, saudavel: 5 }
 ];
 
 window.perguntas = perguntas;
 window.cursos = cursos;
 window.cargosPublicos = cargosPublicos;
+
+// Pesos das disciplinas para cursos e cargos
+if (!window.disciplinasPesos) window.disciplinasPesos = {};
+window.disciplinasPesos.cursos = {
+  Direito: { Português: 5, História: 5, Filosofia: 4, Geografia: 3, Matemática: 2 },
+  Medicina: { Biologia: 5, Química: 5, Ciências: 5, Português: 3, Matemática: 3 },
+  "Engenharia Civil": { Matemática: 5, Física: 5, Química: 3, "Desenho Técnico": 4 },
+  "Ciência da Computação": { Matemática: 5, Tecnologia: 5, Física: 4, Lógica: 5 },
+  Psicologia: { Português: 4, Filosofia: 4, Biologia: 4, História: 3 },
+  Pedagogia: { Português: 5, História: 4, Filosofia: 4, Artes: 3 },
+  Administração: { Matemática: 4, Português: 4, Geografia: 3, Filosofia: 2, Tecnologia: 3 }
+};
+window.disciplinasPesos.cargos = {
+  "Auditor Fiscal": { Matemática: 5, Direito: 4, Economia: 5, Português: 4 },
+  "Professor de Educação Básica": { Pedagogia: 5, Português: 5, Matemática: 4, Psicologia: 4 },
+  "Analista Judiciário (Área Administrativa)": { Português: 5, Direito: 5, Administração: 4, Raciocínio: 4 },
+  "Policial Federal": { "Educação Física": 5, Psicologia: 3, Direito: 4 },
+  "Especialista em Políticas Públicas": { Economia: 4, Sociologia: 4, Português: 4 },
+  "Técnico Judiciário (TI)": { Tecnologia: 5, Matemática: 4, Inglês: 3 },
+  "Agente da Polícia Rodoviária Federal": { "Educação Física": 5, Direito: 3, Geografia: 4 }
+};

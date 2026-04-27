@@ -12,10 +12,10 @@ const areasMap = {
   empreendedorismo:0, saude:0
 };
 
+// Elementos DOM
 const telaNome = document.getElementById('tela-nome');
 const telaPerguntas = document.getElementById('tela-perguntas');
 const telaResultado = document.getElementById('tela-resultado');
-const telaMaterias = document.getElementById('tela-materias');
 const nomeInput = document.getElementById('nome');
 const iniciarBtn = document.getElementById('btn-iniciar');
 const nomeUsuarioSpan = document.getElementById('nome-usuario');
@@ -29,7 +29,9 @@ const resultadoCursosDiv = document.getElementById('resultado-cursos');
 const resultadoCargosDiv = document.getElementById('resultado-cargos');
 const btnReiniciar = document.getElementById('btn-reiniciar');
 
-function resetPontuacoes() { for (let key in areasMap) pontuacoes[key] = 0; }
+function resetPontuacoes() {
+  for (let key in areasMap) pontuacoes[key] = 0;
+}
 
 function carregarPergunta() {
   const p = perguntas[indicePerguntaAtual];
@@ -98,13 +100,12 @@ function calcularSimilaridade(perfilUsuario, perfilReferencia) {
   }
   if (normaU === 0 || normaR === 0) return 0;
   let cosseno = produto / (Math.sqrt(normaU) * Math.sqrt(normaR));
+  // Converte para porcentagem (0..100) -> similaridade = (cosseno + 1) / 2 * 100
   return Math.round(((cosseno + 1) / 2) * 100);
 }
 
 function gerarResultados() {
   calcularPerfil();
-
-  // Cursos
   let resultadosCursos = cursos.map(curso => {
     let sim = calcularSimilaridade(pontuacoes, curso.perfil);
     return { ...curso, similaridade: sim };
@@ -113,20 +114,6 @@ function gerarResultados() {
   resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
   for (let i = 0; i < Math.min(7, resultadosCursos.length); i++) {
     const c = resultadosCursos[i];
-    
-    let disciplinasHtml = '';
-    const pesosCurso = window.disciplinasPesos?.cursos?.[c.nome];
-    if (pesosCurso) {
-      const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
-      disciplinasHtml = '<p><strong>📖 Disciplinas mais exigidas:</strong><br>';
-      for (let [disc, peso] of Object.entries(pesosCurso)) {
-        const notaUsuario = notas[disc] || 3;
-        let emoji = notaUsuario >= 4 ? '✅' : (notaUsuario <= 2 ? '⚠️' : '➖');
-        disciplinasHtml += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
-      }
-      disciplinasHtml += '</p>';
-    }
-    
     resultadoCursosDiv.innerHTML += `
       <div class="card">
         <h3>${c.nome} (${c.similaridade}% compatível)</h3>
@@ -136,12 +123,9 @@ function gerarResultados() {
         <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
         <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
         <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
-        ${disciplinasHtml}
       </div>
     `;
   }
-
-  // Cargos públicos
   let resultadosCargos = cargosPublicos.map(cargo => {
     let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
     return { ...cargo, similaridade: sim };
@@ -150,20 +134,6 @@ function gerarResultados() {
   resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
   for (let i = 0; i < Math.min(7, resultadosCargos.length); i++) {
     const c = resultadosCargos[i];
-    
-    let disciplinasHtml = '';
-    const pesosCargo = window.disciplinasPesos?.cargos?.[c.nome];
-    if (pesosCargo) {
-      const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
-      disciplinasHtml = '<p><strong>📖 Disciplinas mais exigidas (cargo):</strong><br>';
-      for (let [disc, peso] of Object.entries(pesosCargo)) {
-        const notaUsuario = notas[disc] || 3;
-        let emoji = notaUsuario >= 4 ? '✅' : (notaUsuario <= 2 ? '⚠️' : '➖');
-        disciplinasHtml += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
-      }
-      disciplinasHtml += '</p>';
-    }
-    
     resultadoCargosDiv.innerHTML += `
       <div class="card">
         <h3>${c.nome} (${c.similaridade}% compatível)</h3>
@@ -173,53 +143,21 @@ function gerarResultados() {
         <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
         <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
         <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
-        ${disciplinasHtml}
       </div>
     `;
   }
 }
 
-// TELA DE MATÉRIAS
-const materiasLista = ["Matemática", "Português", "História", "Ciências", "Artes", "Tecnologia", "Filosofia", "Geografia", "Biologia", "Química", "Física", "Educação Física"];
-let notasMaterias = {};
-
-function carregarTelaMaterias() {
-  const container = document.getElementById("materias-container");
-  if (!container) return;
-  let html = "";
-  materiasLista.forEach(materia => {
-    html += `<div style="margin-bottom: 1rem;">
-      <label>${materia}: </label>
-      <input type="range" id="nota_${materia}" min="1" max="5" step="1" value="3" style="width: 60%;">
-      <span id="valor_${materia}">3</span>
-    </div>`;
-  });
-  container.innerHTML = html;
-  materiasLista.forEach(materia => {
-    const slider = document.getElementById(`nota_${materia}`);
-    const span = document.getElementById(`valor_${materia}`);
-    slider.addEventListener("input", () => { span.innerText = slider.value; });
-  });
-}
-
 iniciarBtn.addEventListener('click', () => {
   const nome = nomeInput.value.trim();
-  if (nome === '') { alert('Por favor, digite seu nome.'); return; }
+  if (nome === '') {
+    alert('Por favor, digite seu nome.');
+    return;
+  }
   usuarioNome = nome;
   nomeUsuarioSpan.textContent = usuarioNome;
   resultadoNome.textContent = usuarioNome;
   telaNome.style.display = 'none';
-  telaMaterias.style.display = 'block';
-  carregarTelaMaterias();
-});
-
-document.getElementById('btn-proximo-materias')?.addEventListener('click', () => {
-  materiasLista.forEach(materia => {
-    const slider = document.getElementById(`nota_${materia}`);
-    if (slider) notasMaterias[materia] = parseInt(slider.value);
-  });
-  localStorage.setItem("preferenciasMaterias", JSON.stringify(notasMaterias));
-  telaMaterias.style.display = 'none';
   telaPerguntas.style.display = 'block';
   respostas = new Array(perguntas.length).fill(undefined);
   indicePerguntaAtual = 0;
@@ -229,31 +167,21 @@ document.getElementById('btn-proximo-materias')?.addEventListener('click', () =>
 });
 
 btnProximo.addEventListener('click', avancar);
+
 btnConcluir.addEventListener('click', () => {
-  if (respostas[indicePerguntaAtual] === undefined) { alert("Responda a última pergunta."); return; }
+  if (respostas[indicePerguntaAtual] === undefined) {
+    alert("Responda a última pergunta.");
+    return;
+  }
   gerarResultados();
   telaPerguntas.style.display = 'none';
   telaResultado.style.display = 'block';
 });
+
 btnReiniciar.addEventListener('click', () => {
   telaResultado.style.display = 'none';
   telaNome.style.display = 'block';
   nomeInput.value = '';
   respostas = [];
   indicePerguntaAtual = 0;
-});
-
-// Botão compartilhar
-document.addEventListener('DOMContentLoaded', function() {
-  const shareBtn = document.getElementById('btn-compartilhar');
-  if (shareBtn) {
-    shareBtn.addEventListener('click', () => {
-      let resumo = `Quiz Vocacional - Resultado para ${usuarioNome || "usuário"}:\n\n`;
-      resumo += "🎓 Cursos superiores recomendados:\n";
-      document.querySelectorAll("#resultado-cursos .card h3").forEach(h3 => { resumo += `- ${h3.innerText}\n`; });
-      resumo += "\n🏛️ Cargos públicos recomendados:\n";
-      document.querySelectorAll("#resultado-cargos .card h3").forEach(h3 => { resumo += `- ${h3.innerText}\n`; });
-      navigator.clipboard.writeText(resumo).then(() => alert("Resumo copiado!")).catch(() => alert("Falha ao copiar."));
-    });
-  }
 });
