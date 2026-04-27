@@ -111,7 +111,7 @@ function gerarResultados() {
   });
   resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
   resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
-  for (let i = 0; i < Math.min(7, resultadosCursos.length); i++) {
+  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
     const c = resultadosCursos[i];
     
     let disciplinasHtml = '';
@@ -148,7 +148,7 @@ function gerarResultados() {
   });
   resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
   resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
-  for (let i = 0; i < Math.min(7, resultadosCargos.length); i++) {
+  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
     const c = resultadosCargos[i];
     
     let disciplinasHtml = '';
