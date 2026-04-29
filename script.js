@@ -388,7 +388,7 @@ function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
 // O comando a seguir insere a linha dentro da criação do card de cursos.
 
 
-// Botão WhatsApp (com percentuais)
+// Evento do botão WhatsApp
 document.addEventListener('DOMContentLoaded', function() {
   const whatsBtn = document.getElementById('btn-whatsapp');
   if (whatsBtn) {
@@ -396,25 +396,25 @@ document.addEventListener('DOMContentLoaded', function() {
       const nome = usuarioNome || "Usuário";
       const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
       const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
-      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes: ${window.location.href}`;
+      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes no site`;
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     });
   }
 });
 
-// Botão Gerar Imagem
+// Evento do botão Gerar Imagem
 document.addEventListener('DOMContentLoaded', function() {
-  const btnImg = document.getElementById('btn-img');
-  if (btnImg) {
-    btnImg.addEventListener('click', async function() {
-      const resultadosContainer = document.querySelector('.container #tela-resultado');
+  const imgBtn = document.getElementById('btn-img');
+  if (imgBtn) {
+    imgBtn.addEventListener('click', async () => {
+      const resultadosContainer = document.querySelector('#tela-resultado');
       if (!resultadosContainer) {
         alert("Nenhum resultado disponível. Complete o quiz primeiro.");
         return;
       }
       try {
-        btnImg.innerText = "⏳ Gerando...";
-        btnImg.disabled = true;
+        imgBtn.innerText = "⏳ Gerando...";
+        imgBtn.disabled = true;
         const canvas = await html2canvas(resultadosContainer, {
           scale: 2,
           backgroundColor: '#0a0f1c',
@@ -422,15 +422,15 @@ document.addEventListener('DOMContentLoaded', function() {
           useCORS: true
         });
         const link = document.createElement('a');
-        link.download = 'resultado_quiz.png';
+        link.download = `resultado_quiz_${new Date().toISOString().slice(0,19)}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
         alert("✅ Imagem gerada! Envie-a manualmente no WhatsApp.");
       } catch (err) {
         alert("❌ Erro ao gerar imagem: " + err.message);
       } finally {
-        btnImg.innerText = "📸 Gerar Imagem";
-        btnImg.disabled = false;
+        imgBtn.innerText = "📸 Gerar Imagem";
+        imgBtn.disabled = false;
       }
     });
   }
