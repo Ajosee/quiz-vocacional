@@ -117,13 +117,14 @@ function gerarResultados() {
     const c = resultadosCursos[i];
     resultadoCursosDiv.innerHTML += `
       <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cursos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
         <p><strong>✅ Prós:</strong> ${c.pros}</p>
         <p><strong>❌ Contras:</strong> ${c.contras}</p>
         <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
         <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
         <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
         <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
+      ${disciplinasHtml}
       </div>
     `;
   }
@@ -137,13 +138,14 @@ function gerarResultados() {
     const c = resultadosCargos[i];
     resultadoCargosDiv.innerHTML += `
       <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cargos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
         <p><strong>✅ Prós:</strong> ${c.pros}</p>
         <p><strong>❌ Contras:</strong> ${c.contras}</p>
         <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
         <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
         <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
         <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
+      ${disciplinasHtmlCargo}
       </div>
     `;
   }
@@ -387,10 +389,12 @@ function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
 // Como não quero arriscar quebrar, vou pedir que você execute um comando sed seguro.
 // O comando a seguir insere a linha dentro da criação do card de cursos.
 
+
+// Botão WhatsApp
 document.addEventListener('DOMContentLoaded', function() {
-  const whatsBtn = document.getElementById('btn-whatsapp');
-  if (whatsBtn) {
-    whatsBtn.addEventListener('click', () => {
+  const btn = document.getElementById('btn-whatsapp');
+  if (btn) {
+    btn.addEventListener('click', () => {
       const nome = usuarioNome || "Usuário";
       const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
       const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
@@ -399,15 +403,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Botão Gerar Imagem
 document.addEventListener('DOMContentLoaded', function() {
-  const imgBtn = document.getElementById('btn-img');
-  if (imgBtn) {
-    imgBtn.addEventListener('click', async () => {
+  const btn = document.getElementById('btn-img');
+  if (btn) {
+    btn.addEventListener('click', async () => {
       const el = document.querySelector('#tela-resultado');
-      if (!el) return alert("Nenhum resultado");
+      if (!el) return alert("Sem resultado");
       try {
-        imgBtn.innerText = "⏳";
-        imgBtn.disabled = true;
+        btn.innerText = "⏳";
+        btn.disabled = true;
         const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0a0f1c' });
         const link = document.createElement('a');
         link.download = 'resultado.png';
@@ -417,8 +423,8 @@ document.addEventListener('DOMContentLoaded', function() {
       } catch (err) {
         alert("Erro: " + err);
       } finally {
-        imgBtn.innerText = "📸 Gerar Imagem";
-        imgBtn.disabled = false;
+        btn.innerText = "📸 Gerar Imagem";
+        btn.disabled = false;
       }
     });
   }

@@ -105,3 +105,49 @@ progress {
 button#btn-reiniciar {
   background: #ff9800;
 }
+#btn-img, #btn-whatsapp, #btn-compartilhar, #btn-reiniciar {
+  margin: 0.2rem;
+}
+
+/* Tooltip personalizado */
+.info-icon {
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  background: #4caf50;
+  color: #0a0f1c;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 1.2rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: #1e2a3a;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 0.5rem;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -110px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.8rem;
+  border: 1px solid #4caf50;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

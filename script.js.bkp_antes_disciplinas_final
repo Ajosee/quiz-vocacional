@@ -113,7 +113,7 @@ function gerarResultados() {
   });
   resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
   resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
-  for (let i = 0; i < Math.min(7, resultadosCursos.length); i++) {
+  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
     const c = resultadosCursos[i];
     resultadoCursosDiv.innerHTML += `
       <div class="card">
@@ -133,7 +133,7 @@ function gerarResultados() {
   });
   resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
   resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
-  for (let i = 0; i < Math.min(7, resultadosCargos.length); i++) {
+  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
     const c = resultadosCargos[i];
     resultadoCargosDiv.innerHTML += `
       <div class="card">
@@ -387,3 +387,51 @@ function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
 // Como não quero arriscar quebrar, vou pedir que você execute um comando sed seguro.
 // O comando a seguir insere a linha dentro da criação do card de cursos.
 
+
+// Botão WhatsApp (com percentuais)
+document.addEventListener('DOMContentLoaded', function() {
+  const whatsBtn = document.getElementById('btn-whatsapp');
+  if (whatsBtn) {
+    whatsBtn.addEventListener('click', () => {
+      const nome = usuarioNome || "Usuário";
+      const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
+      const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
+      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes: ${window.location.href}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+  }
+});
+
+// Botão Gerar Imagem
+document.addEventListener('DOMContentLoaded', function() {
+  const btnImg = document.getElementById('btn-img');
+  if (btnImg) {
+    btnImg.addEventListener('click', async function() {
+      const resultadosContainer = document.querySelector('.container #tela-resultado');
+      if (!resultadosContainer) {
+        alert("Nenhum resultado disponível. Complete o quiz primeiro.");
+        return;
+      }
+      try {
+        btnImg.innerText = "⏳ Gerando...";
+        btnImg.disabled = true;
+        const canvas = await html2canvas(resultadosContainer, {
+          scale: 2,
+          backgroundColor: '#0a0f1c',
+          logging: false,
+          useCORS: true
+        });
+        const link = document.createElement('a');
+        link.download = 'resultado_quiz.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        alert("✅ Imagem gerada! Envie-a manualmente no WhatsApp.");
+      } catch (err) {
+        alert("❌ Erro ao gerar imagem: " + err.message);
+      } finally {
+        btnImg.innerText = "📸 Gerar Imagem";
+        btnImg.disabled = false;
+      }
+    });
+  }
+});

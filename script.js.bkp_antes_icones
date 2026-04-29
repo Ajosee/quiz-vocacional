@@ -117,7 +117,7 @@ function gerarResultados() {
     const c = resultadosCursos[i];
     resultadoCursosDiv.innerHTML += `
       <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cursos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
         <p><strong>✅ Prós:</strong> ${c.pros}</p>
         <p><strong>❌ Contras:</strong> ${c.contras}</p>
         <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
@@ -137,7 +137,7 @@ function gerarResultados() {
     const c = resultadosCargos[i];
     resultadoCargosDiv.innerHTML += `
       <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cargos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
         <p><strong>✅ Prós:</strong> ${c.pros}</p>
         <p><strong>❌ Contras:</strong> ${c.contras}</p>
         <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>

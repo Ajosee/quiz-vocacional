@@ -117,7 +117,7 @@ function gerarResultados() {
     const c = resultadosCursos[i];
     resultadoCursosDiv.innerHTML += `
       <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cursos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
         <p><strong>✅ Prós:</strong> ${c.pros}</p>
         <p><strong>❌ Contras:</strong> ${c.contras}</p>
         <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
@@ -137,7 +137,7 @@ function gerarResultados() {
     const c = resultadosCargos[i];
     resultadoCargosDiv.innerHTML += `
       <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cargos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
         <p><strong>✅ Prós:</strong> ${c.pros}</p>
         <p><strong>❌ Contras:</strong> ${c.contras}</p>
         <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
@@ -387,39 +387,3 @@ function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
 // Como não quero arriscar quebrar, vou pedir que você execute um comando sed seguro.
 // O comando a seguir insere a linha dentro da criação do card de cursos.
 
-document.addEventListener('DOMContentLoaded', function() {
-  const whatsBtn = document.getElementById('btn-whatsapp');
-  if (whatsBtn) {
-    whatsBtn.addEventListener('click', () => {
-      const nome = usuarioNome || "Usuário";
-      const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
-      const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
-      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes no site`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    });
-  }
-});
-document.addEventListener('DOMContentLoaded', function() {
-  const imgBtn = document.getElementById('btn-img');
-  if (imgBtn) {
-    imgBtn.addEventListener('click', async () => {
-      const el = document.querySelector('#tela-resultado');
-      if (!el) return alert("Nenhum resultado");
-      try {
-        imgBtn.innerText = "⏳";
-        imgBtn.disabled = true;
-        const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0a0f1c' });
-        const link = document.createElement('a');
-        link.download = 'resultado.png';
-        link.href = canvas.toDataURL();
-        link.click();
-        alert("Imagem salva!");
-      } catch (err) {
-        alert("Erro: " + err);
-      } finally {
-        imgBtn.innerText = "📸 Gerar Imagem";
-        imgBtn.disabled = false;
-      }
-    });
-  }
-});
