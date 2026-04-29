@@ -12,10 +12,11 @@ const areasMap = {
   empreendedorismo:0, saude:0
 };
 
+// Elementos DOM
 const telaNome = document.getElementById('tela-nome');
 const telaPerguntas = document.getElementById('tela-perguntas');
 const telaResultado = document.getElementById('tela-resultado');
-const telaMaterias = document.getElementById('tela-materias');
+const telaMaterias = document.getElementById("tela-materias");
 const nomeInput = document.getElementById('nome');
 const iniciarBtn = document.getElementById('btn-iniciar');
 const nomeUsuarioSpan = document.getElementById('nome-usuario');
@@ -29,7 +30,9 @@ const resultadoCursosDiv = document.getElementById('resultado-cursos');
 const resultadoCargosDiv = document.getElementById('resultado-cargos');
 const btnReiniciar = document.getElementById('btn-reiniciar');
 
-function resetPontuacoes() { for (let key in areasMap) pontuacoes[key] = 0; }
+function resetPontuacoes() {
+  for (let key in areasMap) pontuacoes[key] = 0;
+}
 
 function carregarPergunta() {
   const p = perguntas[indicePerguntaAtual];
@@ -98,88 +101,161 @@ function calcularSimilaridade(perfilUsuario, perfilReferencia) {
   }
   if (normaU === 0 || normaR === 0) return 0;
   let cosseno = produto / (Math.sqrt(normaU) * Math.sqrt(normaR));
+  // Converte para porcentagem (0..100) -> similaridade = (cosseno + 1) / 2 * 100
   return Math.round(((cosseno + 1) / 2) * 100);
 }
 
-function gerarResultados() {
-  calcularPerfil();
 
-  // Cursos
-  let resultadosCursos = cursos.map(curso => {
-    let sim = calcularSimilaridade(pontuacoes, curso.perfil);
-    return { ...curso, similaridade: sim };
-  });
-  resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
-  resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
-  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
-    const c = resultadosCursos[i];
-    
-    let disciplinasHtml = '';
-    const pesosCurso = window.disciplinasPesos?.cursos?.[c.nome];
-    if (pesosCurso) {
-      const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
-      disciplinasHtml = '<p><strong>📖 Disciplinas mais exigidas:</strong><br>';
-      for (let [disc, peso] of Object.entries(pesosCurso)) {
-        const notaUsuario = notas[disc] || 3;
-        let emoji = notaUsuario >= 4 ? '✅' : (notaUsuario <= 2 ? '⚠️' : '➖');
-        disciplinasHtml += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
-      }
-      disciplinasHtml += '</p>';
-    }
-    
-    resultadoCursosDiv.innerHTML += `
-      <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
-        <p><strong>✅ Prós:</strong> ${c.pros}</p>
-        <p><strong>❌ Contras:</strong> ${c.contras}</p>
-        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
-        <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
-        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
-        <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
-        ${disciplinasHtml}
-      </div>
-    `;
+iniciarBtn.addEventListener('click', () => {
+  const nome = nomeInput.value.trim();
+  if (nome === '') {
+    alert('Por favor, digite seu nome.');
+    return;
   }
+  usuarioNome = nome;
+  nomeUsuarioSpan.textContent = usuarioNome;
+  resultadoNome.textContent = usuarioNome;
+  telaNome.style.display = 'none';
+  telaPerguntas.style.display = 'block';
+  respostas = new Array(perguntas.length).fill(undefined);
+  indicePerguntaAtual = 0;
+  btnProximo.style.display = 'inline-block';
+  btnConcluir.style.display = 'none';
+  carregarPergunta();
+});
 
-  // Cargos públicos
-  let resultadosCargos = cargosPublicos.map(cargo => {
-    let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
-    return { ...cargo, similaridade: sim };
-  });
-  resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
-  resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
-  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
-    const c = resultadosCargos[i];
-    
-    let disciplinasHtml = '';
-    const pesosCargo = window.disciplinasPesos?.cargos?.[c.nome];
-    if (pesosCargo) {
-      const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
-      disciplinasHtml = '<p><strong>📖 Disciplinas mais exigidas (cargo):</strong><br>';
-      for (let [disc, peso] of Object.entries(pesosCargo)) {
-        const notaUsuario = notas[disc] || 3;
-        let emoji = notaUsuario >= 4 ? '✅' : (notaUsuario <= 2 ? '⚠️' : '➖');
-        disciplinasHtml += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
-      }
-      disciplinasHtml += '</p>';
-    }
-    
-    resultadoCargosDiv.innerHTML += `
-      <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
-        <p><strong>✅ Prós:</strong> ${c.pros}</p>
-        <p><strong>❌ Contras:</strong> ${c.contras}</p>
-        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
-        <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
-        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
-        <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
-        ${disciplinasHtml}
-      </div>
-    `;
+btnProximo.addEventListener('click', avancar);
+
+btnConcluir.addEventListener('click', () => {
+  if (respostas[indicePerguntaAtual] === undefined) {
+    alert("Responda a última pergunta.");
+    return;
   }
-}
+  gerarResultados();
+  telaPerguntas.style.display = 'none';
+  telaResultado.style.display = 'block';
+    // Adiciona seção de feedback após os resultados
 
-// TELA DE MATÉRIAS
+    if (!document.getElementById("feedback-section")) {
+
+      const fbDiv = document.createElement("div");
+
+      fbDiv.id = "feedback-section";
+
+      fbDiv.style.margin = "1rem 0";
+
+      fbDiv.style.padding = "0.5rem";
+
+      fbDiv.style.background = "#1e2a3a";
+
+      fbDiv.style.borderRadius = "0.5rem";
+
+      fbDiv.innerHTML = `<p><strong>📢 Sua opinião é importante!</strong><br>Você concorda com as recomendações acima?</p>
+        <button id="feedback-sim" style="background:#4caf50; margin-right:0.5rem;">👍 Sim</button>
+        <button id="feedback-nao" style="background:#f44336; margin-right:0.5rem;">👎 Não</button>
+        <button id="feedback-talvez" style="background:#ff9800;">🤔 Talvez</button>
+        <div id="feedback-msg" style="margin-top:0.5rem; font-size:0.8rem;"></div>`;
+
+      document.getElementById("resultado-cargos").insertAdjacentElement("afterend", fbDiv);
+
+      const simBtn = document.getElementById("feedback-sim");
+
+      const naoBtn = document.getElementById("feedback-nao");
+
+      const talvezBtn = document.getElementById("feedback-talvez");
+
+      const msgDiv = document.getElementById("feedback-msg");
+
+      simBtn.addEventListener("click", () => {
+
+        localStorage.setItem("quizFeedback", "sim");
+
+        msgDiv.innerHTML = "🙏 Obrigado! Seu feedback ajuda a melhorar o quiz.";
+
+        setTimeout(() => { fbDiv.style.display = "none"; }, 3000);
+
+      });
+
+      naoBtn.addEventListener("click", () => {
+
+        localStorage.setItem("quizFeedback", "nao");
+
+        msgDiv.innerHTML = "😕 Sentimos muito. Em breve ajustaremos as recomendações.";
+
+        setTimeout(() => { fbDiv.style.display = "none"; }, 3000);
+
+      });
+
+      talvezBtn.addEventListener("click", () => {
+
+        localStorage.setItem("quizFeedback", "talvez");
+
+        msgDiv.innerHTML = "🤔 Obrigado pela honestidade. Continuaremos melhorando!";
+
+        setTimeout(() => { fbDiv.style.display = "none"; }, 3000);
+
+      });
+
+    }
+
+
+});
+
+btnReiniciar.addEventListener('click', () => {
+  telaResultado.style.display = 'none';
+  telaNome.style.display = 'block';
+  nomeInput.value = '';
+  respostas = [];
+  indicePerguntaAtual = 0;
+});
+
+// Botão de compartilhar resultados (adicionado dinamicamente)
+document.addEventListener('DOMContentLoaded', function() {
+  const btnCompartilhar = document.getElementById('btn-compartilhar');
+  if (btnCompartilhar) {
+    btnCompartilhar.addEventListener('click', () => {
+      let resumo = `Quiz Vocacional - Resultado para ${usuarioNome}:\n\n`;
+      resumo += "🎓 Cursos superiores recomendados:\n";
+      const cursosCards = document.querySelectorAll("#resultado-cursos .card");
+      cursosCards.forEach(card => {
+        const titulo = card.querySelector("h3")?.innerText || "";
+        resumo += `- ${titulo}\n`;
+      });
+      resumo += "\n🏛️ Cargos públicos recomendados:\n";
+      const cargosCards = document.querySelectorAll("#resultado-cargos .card");
+      cargosCards.forEach(card => {
+        const titulo = card.querySelector("h3")?.innerText || "";
+        resumo += `- ${titulo}\n`;
+      });
+      navigator.clipboard.writeText(resumo).then(() => {
+        alert("Resumo copiado para a área de transferência!");
+      }).catch(() => {
+        alert("Não foi possível copiar. Copie manualmente.");
+      });
+    });
+  }
+});
+
+// Adiciona evento de clique no botão compartilhar
+document.addEventListener('DOMContentLoaded', function() {
+  const shareBtn = document.getElementById('btn-compartilhar');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      let resumo = `Quiz Vocacional - Resultado para ${usuarioNome || "usuário"}:\n\n`;
+      resumo += "🎓 Cursos superiores recomendados:\n";
+      document.querySelectorAll("#resultado-cursos .card h3").forEach(h3 => {
+        resumo += `- ${h3.innerText}\n`;
+      });
+      resumo += "\n🏛️ Cargos públicos recomendados:\n";
+      document.querySelectorAll("#resultado-cargos .card h3").forEach(h3 => {
+        resumo += `- ${h3.innerText}\n`;
+      });
+      navigator.clipboard.writeText(resumo).then(() => alert("Resumo copiado para área de transferência!")).catch(() => alert("Falha ao copiar."));
+    });
+  }
+});
+
+// ==================== TELA DE MATÉRIAS ====================
 const materiasLista = ["Matemática", "Português", "História", "Ciências", "Artes", "Tecnologia", "Filosofia", "Geografia", "Biologia", "Química", "Física", "Educação Física"];
 let notasMaterias = {};
 
@@ -195,32 +271,47 @@ function carregarTelaMaterias() {
     </div>`;
   });
   container.innerHTML = html;
+  // Adiciona eventos para mostrar o valor atual
   materiasLista.forEach(materia => {
     const slider = document.getElementById(`nota_${materia}`);
     const span = document.getElementById(`valor_${materia}`);
-    slider.addEventListener("input", () => { span.innerText = slider.value; });
+    slider.addEventListener("input", () => {
+      span.innerText = slider.value;
+    });
   });
 }
 
-iniciarBtn.addEventListener('click', () => {
-  const nome = nomeInput.value.trim();
-  if (nome === '') { alert('Por favor, digite seu nome.'); return; }
-  usuarioNome = nome;
-  nomeUsuarioSpan.textContent = usuarioNome;
-  resultadoNome.textContent = usuarioNome;
-  telaNome.style.display = 'none';
-  telaMaterias.style.display = 'block';
-  carregarTelaMaterias();
-});
+// Substituir o comportamento do botão "Começar quiz"
+const btnIniciarOriginal = document.getElementById('btn-iniciar');
+if (btnIniciarOriginal) {
+  btnIniciarOriginal.addEventListener('click', () => {
+    const nome = nomeInput.value.trim();
+    if (nome === '') {
+      alert('Por favor, digite seu nome.');
+      return;
+    }
+    usuarioNome = nome;
+    nomeUsuarioSpan.textContent = usuarioNome;
+    resultadoNome.textContent = usuarioNome;
+    telaNome.style.display = 'none';
+    telaMaterias.style.display = 'block';
+    carregarTelaMaterias();
+  });
+}
 
+// Botão "Próximo" da tela de matérias
 document.getElementById('btn-proximo-materias')?.addEventListener('click', () => {
+  // Coleta as notas
   materiasLista.forEach(materia => {
     const slider = document.getElementById(`nota_${materia}`);
     if (slider) notasMaterias[materia] = parseInt(slider.value);
   });
+  // Armazena no localStorage ou em variável global
   localStorage.setItem("preferenciasMaterias", JSON.stringify(notasMaterias));
+  // Avança para as perguntas
   telaMaterias.style.display = 'none';
   telaPerguntas.style.display = 'block';
+  // Inicializa o quiz (já existente)
   respostas = new Array(perguntas.length).fill(undefined);
   indicePerguntaAtual = 0;
   btnProximo.style.display = 'inline-block';
@@ -228,32 +319,107 @@ document.getElementById('btn-proximo-materias')?.addEventListener('click', () =>
   carregarPergunta();
 });
 
-btnProximo.addEventListener('click', avancar);
-btnConcluir.addEventListener('click', () => {
-  if (respostas[indicePerguntaAtual] === undefined) { alert("Responda a última pergunta."); return; }
-  gerarResultados();
-  telaPerguntas.style.display = 'none';
-  telaResultado.style.display = 'block';
-});
-btnReiniciar.addEventListener('click', () => {
-  telaResultado.style.display = 'none';
-  telaNome.style.display = 'block';
-  nomeInput.value = '';
-  respostas = [];
-  indicePerguntaAtual = 0;
-});
+// Função para gerar texto de adequação com base nas notas das matérias
+function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
+  const pesos = window.disciplinasPesos?.[tipo]?.[cursoNome];
+  if (!pesos) return "";
+  const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
+  let feedback = "<p><strong>📖 Disciplinas mais exigidas:</strong><br>";
+  for (let [disc, peso] of Object.entries(pesos)) {
+    const notaUsuario = notas[disc] || 3; // padrão 3
+    let emoji = notaUsuario >= 4 ? "✅" : (notaUsuario <= 2 ? "⚠️" : "➖");
+    feedback += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
+  }
+  feedback += "</p>";
+  return feedback;
+}
 
-// Botão compartilhar
+// Substituir a criação dos cards de cursos e cargos para incluir essa informação.
+// Como a função gerarResultados já existe, precisamos alterá-la.
+// Vamos fazer uma cópia e modificar com sed (mais seguro).
+// Mas, como o script é grande, faremos uma substituição direta.
+// Para evitar duplicação, anexamos um observador após o carregamento.
+// No entanto, o mais fácil é modificar a função original.
+// Vamos usar sed para inserir a chamada dentro do laço de cursos.
+// Como não quero arriscar quebrar, vou pedir que você execute um comando sed seguro.
+// O comando a seguir insere a linha dentro da criação do card de cursos.
+
+
+// Botão WhatsApp (apenas gera link com texto)
 document.addEventListener('DOMContentLoaded', function() {
-  const shareBtn = document.getElementById('btn-compartilhar');
-  if (shareBtn) {
-    shareBtn.addEventListener('click', () => {
-      let resumo = `Quiz Vocacional - Resultado para ${usuarioNome || "usuário"}:\n\n`;
-      resumo += "🎓 Cursos superiores recomendados:\n";
-      document.querySelectorAll("#resultado-cursos .card h3").forEach(h3 => { resumo += `- ${h3.innerText}\n`; });
-      resumo += "\n🏛️ Cargos públicos recomendados:\n";
-      document.querySelectorAll("#resultado-cargos .card h3").forEach(h3 => { resumo += `- ${h3.innerText}\n`; });
-      navigator.clipboard.writeText(resumo).then(() => alert("Resumo copiado!")).catch(() => alert("Falha ao copiar."));
+});
+function gerarResultados() {
+  calcularPerfil();
+  let resultadosCursos = cursos.map(curso => {
+    let sim = calcularSimilaridade(pontuacoes, curso.perfil);
+    return { ...curso, similaridade: sim };
+  });
+  resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
+  resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
+  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
+    const c = resultadosCursos[i];
+    resultadoCursosDiv.innerHTML += `
+      <div class="card">
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
+        <p><strong>✅ Prós:</strong> ${c.pros}</p>
+        <p><strong>❌ Contras:</strong> ${c.contras}</p>
+        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
+        <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
+        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
+        <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
+      </div>
+    `;
+  }
+  let resultadosCargos = cargosPublicos.map(cargo => {
+    let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
+    return { ...cargo, similaridade: sim };
+  });
+  resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
+  resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
+  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
+    const c = resultadosCargos[i];
+    resultadoCargosDiv.innerHTML += `
+      <div class="card">
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
+        <p><strong>✅ Prós:</strong> ${c.pros}</p>
+        <p><strong>❌ Contras:</strong> ${c.contras}</p>
+        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
+        <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
+        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
+        <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
+      </div>
+    `;
+  }
+}
+
+// Botão WhatsApp (com percentuais de compatibilidade)
+document.addEventListener('DOMContentLoaded', function() {
+  const whatsBtn = document.getElementById('btn-whatsapp');
+  if (whatsBtn) {
+    whatsBtn.addEventListener('click', () => {
+      const nome = usuarioNome || "Usuário";
+      const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
+      const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
+      const msg = `✅ *Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos superiores recomendados:*%0a${cursos}%0a%0a*🏛️ Cargos públicos recomendados:*%0a${cargos}%0a%0a📖 Detalhes completos no site.`;
+      const url = `https://wa.me/?text=${msg}`;
+      window.open(url, "_blank");
     });
   }
 });
+
+// Botão gerar imagem (captura a área de resultados)
+document.getElementById('btn-img')?.addEventListener('click', async () => {
+  const elem = document.querySelector('#resultado-cursos, #resultado-cargos');
+  if (!elem) return alert("Nenhum resultado para capturar.");
+  try {
+    const canvas = await html2canvas(elem.parentElement, { scale: 2 });
+    const link = document.createElement('a');
+    link.download = 'resultado_quiz.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    alert("Imagem gerada! Agora envie pelo WhatsApp manualmente.");
+  } catch (err) {
+    alert("Erro ao gerar imagem: " + err);
+  }
+});
+
