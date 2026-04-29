@@ -105,6 +105,49 @@ function calcularSimilaridade(perfilUsuario, perfilReferencia) {
   return Math.round(((cosseno + 1) / 2) * 100);
 }
 
+function gerarResultados() {
+  calcularPerfil();
+  let resultadosCursos = cursos.map(curso => {
+    let sim = calcularSimilaridade(pontuacoes, curso.perfil);
+    return { ...curso, similaridade: sim };
+  });
+  resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
+  resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
+  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
+    const c = resultadosCursos[i];
+    resultadoCursosDiv.innerHTML += `
+      <div class="card">
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
+        <p><strong>✅ Prós:</strong> ${c.pros}</p>
+        <p><strong>❌ Contras:</strong> ${c.contras}</p>
+        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
+        <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
+        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
+        <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
+      </div>
+    `;
+  }
+  let resultadosCargos = cargosPublicos.map(cargo => {
+    let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
+    return { ...cargo, similaridade: sim };
+  });
+  resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
+  resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
+  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
+    const c = resultadosCargos[i];
+    resultadoCargosDiv.innerHTML += `
+      <div class="card">
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
+        <p><strong>✅ Prós:</strong> ${c.pros}</p>
+        <p><strong>❌ Contras:</strong> ${c.contras}</p>
+        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
+        <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
+        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
+        <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
+      </div>
+    `;
+  }
+}
 
 iniciarBtn.addEventListener('click', () => {
   const nome = nomeInput.value.trim();
@@ -345,54 +388,7 @@ function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
 // O comando a seguir insere a linha dentro da criação do card de cursos.
 
 
-// Botão WhatsApp (apenas gera link com texto)
-document.addEventListener('DOMContentLoaded', function() {
-});
-function gerarResultados() {
-  calcularPerfil();
-  let resultadosCursos = cursos.map(curso => {
-    let sim = calcularSimilaridade(pontuacoes, curso.perfil);
-    return { ...curso, similaridade: sim };
-  });
-  resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
-  resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
-  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
-    const c = resultadosCursos[i];
-    resultadoCursosDiv.innerHTML += `
-      <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
-        <p><strong>✅ Prós:</strong> ${c.pros}</p>
-        <p><strong>❌ Contras:</strong> ${c.contras}</p>
-        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
-        <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
-        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
-        <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
-      </div>
-    `;
-  }
-  let resultadosCargos = cargosPublicos.map(cargo => {
-    let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
-    return { ...cargo, similaridade: sim };
-  });
-  resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
-  resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
-  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
-    const c = resultadosCargos[i];
-    resultadoCargosDiv.innerHTML += `
-      <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
-        <p><strong>✅ Prós:</strong> ${c.pros}</p>
-        <p><strong>❌ Contras:</strong> ${c.contras}</p>
-        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
-        <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
-        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
-        <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
-      </div>
-    `;
-  }
-}
-
-// Botão WhatsApp (com percentuais de compatibilidade)
+// Botão WhatsApp (com percentuais)
 document.addEventListener('DOMContentLoaded', function() {
   const whatsBtn = document.getElementById('btn-whatsapp');
   if (whatsBtn) {
@@ -400,26 +396,42 @@ document.addEventListener('DOMContentLoaded', function() {
       const nome = usuarioNome || "Usuário";
       const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
       const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
-      const msg = `✅ *Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos superiores recomendados:*%0a${cursos}%0a%0a*🏛️ Cargos públicos recomendados:*%0a${cargos}%0a%0a📖 Detalhes completos no site.`;
-      const url = `https://wa.me/?text=${msg}`;
-      window.open(url, "_blank");
+      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes: ${window.location.href}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     });
   }
 });
 
-// Botão gerar imagem (captura a área de resultados)
-document.getElementById('btn-img')?.addEventListener('click', async () => {
-  const elem = document.querySelector('#resultado-cursos, #resultado-cargos');
-  if (!elem) return alert("Nenhum resultado para capturar.");
-  try {
-    const canvas = await html2canvas(elem.parentElement, { scale: 2 });
-    const link = document.createElement('a');
-    link.download = 'resultado_quiz.png';
-    link.href = canvas.toDataURL();
-    link.click();
-    alert("Imagem gerada! Agora envie pelo WhatsApp manualmente.");
-  } catch (err) {
-    alert("Erro ao gerar imagem: " + err);
+// Botão Gerar Imagem
+document.addEventListener('DOMContentLoaded', function() {
+  const btnImg = document.getElementById('btn-img');
+  if (btnImg) {
+    btnImg.addEventListener('click', async function() {
+      const resultadosContainer = document.querySelector('.container #tela-resultado');
+      if (!resultadosContainer) {
+        alert("Nenhum resultado disponível. Complete o quiz primeiro.");
+        return;
+      }
+      try {
+        btnImg.innerText = "⏳ Gerando...";
+        btnImg.disabled = true;
+        const canvas = await html2canvas(resultadosContainer, {
+          scale: 2,
+          backgroundColor: '#0a0f1c',
+          logging: false,
+          useCORS: true
+        });
+        const link = document.createElement('a');
+        link.download = 'resultado_quiz.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        alert("✅ Imagem gerada! Envie-a manualmente no WhatsApp.");
+      } catch (err) {
+        alert("❌ Erro ao gerar imagem: " + err.message);
+      } finally {
+        btnImg.innerText = "📸 Gerar Imagem";
+        btnImg.disabled = false;
+      }
+    });
   }
 });
-
