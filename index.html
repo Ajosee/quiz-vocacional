@@ -9,7 +9,7 @@
 <body>
   <div class="container" id="app">
     <!-- Tela inicial: nome -->
-    <div id="tela-nome" class="tela">
+    <div id="tela-nome" class="tela" style="display:block;">
       <h1>🔍 Descubra sua vocação</h1>
       <p>Responda com sinceridade. Este quiz ajuda a identificar <strong>cursos superiores</strong> e <strong>cargos públicos</strong> compatíveis com seu perfil.</p>
       <label for="nome">Seu nome (obrigatório):</label>
@@ -19,21 +19,14 @@
     </div>
 
     <!-- Tela de matérias (preferências) -->
-
     <div id="tela-materias" class="tela" style="display:none;">
-
       <h2>📚 Preferências por disciplinas</h2>
-
       <p>Antes de começarmos, indique o quanto você gosta de cada matéria (1 = não gosto, 5 = adoro).</p>
-
       <div id="materias-container"></div>
-
       <button id="btn-proximo-materias">👍 Próximo →</button>
-
     </div>
 
-
-    <!-- Tela de perguntas (inicialmente oculta) -->
+    <!-- Tela de perguntas -->
     <div id="tela-perguntas" class="tela" style="display:none;">
       <h2>Olá, <span id="nome-usuario"></span>!</h2>
       <p>Responda cada pergunta com a opção que mais combina com você. Não existe resposta certa ou errada.</p>
@@ -46,21 +39,20 @@
       <button id="btn-concluir" style="display:none;">✨ Ver resultado final</button>
     </div>
 
-    <!-- Tela de resultado (inicialmente oculta) -->
+    <!-- Tela de resultado -->
     <div id="tela-resultado" class="tela" style="display:none;">
       <h2>📊 Olá <span id="resultado-nome"></span>, com base em seu perfil:</h2>
       <div id="resultado-cursos"></div>
       <div id="resultado-cargos"></div>
-    <button id="btn-compartilhar" style="background: #2196f3; margin-right: 0.5rem;">📋 Compartilhar resultado</button>
-    <button id="btn-whatsapp" style="background: #25D366; margin-right: 0.5rem;">📱 Enviar para WhatsApp</button>
-    <button id="btn-img" style="background: #ff9800; margin-right: 0.5rem;">📸 Gerar Imagem</button>
+      <button id="btn-compartilhar" style="background: #2196f3; margin-right: 0.5rem;">📋 Compartilhar resultado</button>
+      <button id="btn-whatsapp" style="background: #25D366; margin-right: 0.5rem;">📱 Enviar para WhatsApp</button>
+      <button id="btn-img" style="background: #ff9800; margin-right: 0.5rem;">📸 Gerar Imagem</button>
       <button id="btn-reiniciar">🔄 Refazer quiz</button>
       <p class="small">* Simulação educativa. Consulte profissionais para decisões finais.</p>
     </div>
   </div>
   <script src="questions.js"></script>
   <script src="script.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>

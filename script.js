@@ -3,6 +3,7 @@ let usuarioNome = '';
 let respostas = [];
 let indicePerguntaAtual = 0;
 let pontuacoes = {};
+
 const areasMap = {
   logica:0, linguagem:0, criatividade:0, organizacao:0, empatia:0,
   lideranca:0, resiliencia:0, tecnologia:0, humanas:0, estabilidade:0,
@@ -12,27 +13,11 @@ const areasMap = {
   empreendedorismo:0, saude:0
 };
 
-// Elementos DOM
-const telaNome = document.getElementById('tela-nome');
-const telaPerguntas = document.getElementById('tela-perguntas');
-const telaResultado = document.getElementById('tela-resultado');
-const telaMaterias = document.getElementById("tela-materias");
-const nomeInput = document.getElementById('nome');
-const iniciarBtn = document.getElementById('btn-iniciar');
-const nomeUsuarioSpan = document.getElementById('nome-usuario');
-const perguntaContainer = document.getElementById('pergunta-container');
-const progressoTexto = document.getElementById('progresso-texto');
-const barraProgresso = document.getElementById('barra-progresso');
-const btnProximo = document.getElementById('btn-proximo');
-const btnConcluir = document.getElementById('btn-concluir');
-const resultadoNome = document.getElementById('resultado-nome');
-const resultadoCursosDiv = document.getElementById('resultado-cursos');
-const resultadoCargosDiv = document.getElementById('resultado-cargos');
-const btnReiniciar = document.getElementById('btn-reiniciar');
+let telaNome, telaPerguntas, telaResultado, telaMaterias, nomeInput, iniciarBtn;
+let nomeUsuarioSpan, perguntaContainer, progressoTexto, barraProgresso, btnProximo, btnConcluir;
+let resultadoNome, resultadoCursosDiv, resultadoCargosDiv, btnReiniciar;
 
-function resetPontuacoes() {
-  for (let key in areasMap) pontuacoes[key] = 0;
-}
+function resetPontuacoes() { for (let key in areasMap) pontuacoes[key] = 0; }
 
 function carregarPergunta() {
   const p = perguntas[indicePerguntaAtual];
@@ -101,166 +86,58 @@ function calcularSimilaridade(perfilUsuario, perfilReferencia) {
   }
   if (normaU === 0 || normaR === 0) return 0;
   let cosseno = produto / (Math.sqrt(normaU) * Math.sqrt(normaR));
-  // Converte para porcentagem (0..100) -> similaridade = (cosseno + 1) / 2 * 100
   return Math.round(((cosseno + 1) / 2) * 100);
 }
 
-
-iniciarBtn.addEventListener('click', () => {
-  const nome = nomeInput.value.trim();
-  if (nome === '') {
-    alert('Por favor, digite seu nome.');
-    return;
+function gerarResultados() {
+  calcularPerfil();
+  let resultadosCursos = cursos.map(curso => {
+    let sim = calcularSimilaridade(pontuacoes, curso.perfil);
+    return { ...curso, similaridade: sim };
+  });
+  resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
+  resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
+  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
+    const c = resultadosCursos[i];
+    resultadoCursosDiv.innerHTML += `
+      <div class="card">
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
+        <p><strong>✅ Prós:</strong> ${c.pros}</p>
+        <p><strong>❌ Contras:</strong> ${c.contras}</p>
+        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
+        <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
+        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
+        <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
+      </div>
+    `;
   }
-  usuarioNome = nome;
-  nomeUsuarioSpan.textContent = usuarioNome;
-  resultadoNome.textContent = usuarioNome;
-  telaNome.style.display = 'none';
-  telaPerguntas.style.display = 'block';
-  respostas = new Array(perguntas.length).fill(undefined);
-  indicePerguntaAtual = 0;
-  btnProximo.style.display = 'inline-block';
-  btnConcluir.style.display = 'none';
-  carregarPergunta();
-});
-
-btnProximo.addEventListener('click', avancar);
-
-btnConcluir.addEventListener('click', () => {
-  if (respostas[indicePerguntaAtual] === undefined) {
-    alert("Responda a última pergunta.");
-    return;
+  let resultadosCargos = cargosPublicos.map(cargo => {
+    let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
+    return { ...cargo, similaridade: sim };
+  });
+  resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
+  resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
+  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
+    const c = resultadosCargos[i];
+    resultadoCargosDiv.innerHTML += `
+      <div class="card">
+        <h3>${c.nome} (${c.similaridade}% compatível)</h3>
+        <p><strong>✅ Prós:</strong> ${c.pros}</p>
+        <p><strong>❌ Contras:</strong> ${c.contras}</p>
+        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
+        <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
+        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
+        <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
+      </div>
+    `;
   }
-  gerarResultados();
-  telaPerguntas.style.display = 'none';
-  telaResultado.style.display = 'block';
-    // Adiciona seção de feedback após os resultados
+}
 
-    if (!document.getElementById("feedback-section")) {
-
-      const fbDiv = document.createElement("div");
-
-      fbDiv.id = "feedback-section";
-
-      fbDiv.style.margin = "1rem 0";
-
-      fbDiv.style.padding = "0.5rem";
-
-      fbDiv.style.background = "#1e2a3a";
-
-      fbDiv.style.borderRadius = "0.5rem";
-
-      fbDiv.innerHTML = `<p><strong>📢 Sua opinião é importante!</strong><br>Você concorda com as recomendações acima?</p>
-        <button id="feedback-sim" style="background:#4caf50; margin-right:0.5rem;">👍 Sim</button>
-        <button id="feedback-nao" style="background:#f44336; margin-right:0.5rem;">👎 Não</button>
-        <button id="feedback-talvez" style="background:#ff9800;">🤔 Talvez</button>
-        <div id="feedback-msg" style="margin-top:0.5rem; font-size:0.8rem;"></div>`;
-
-      document.getElementById("resultado-cargos").insertAdjacentElement("afterend", fbDiv);
-
-      const simBtn = document.getElementById("feedback-sim");
-
-      const naoBtn = document.getElementById("feedback-nao");
-
-      const talvezBtn = document.getElementById("feedback-talvez");
-
-      const msgDiv = document.getElementById("feedback-msg");
-
-      simBtn.addEventListener("click", () => {
-
-        localStorage.setItem("quizFeedback", "sim");
-
-        msgDiv.innerHTML = "🙏 Obrigado! Seu feedback ajuda a melhorar o quiz.";
-
-        setTimeout(() => { fbDiv.style.display = "none"; }, 3000);
-
-      });
-
-      naoBtn.addEventListener("click", () => {
-
-        localStorage.setItem("quizFeedback", "nao");
-
-        msgDiv.innerHTML = "😕 Sentimos muito. Em breve ajustaremos as recomendações.";
-
-        setTimeout(() => { fbDiv.style.display = "none"; }, 3000);
-
-      });
-
-      talvezBtn.addEventListener("click", () => {
-
-        localStorage.setItem("quizFeedback", "talvez");
-
-        msgDiv.innerHTML = "🤔 Obrigado pela honestidade. Continuaremos melhorando!";
-
-        setTimeout(() => { fbDiv.style.display = "none"; }, 3000);
-
-      });
-
-    }
-
-
-});
-
-btnReiniciar.addEventListener('click', () => {
-  telaResultado.style.display = 'none';
-  telaNome.style.display = 'block';
-  nomeInput.value = '';
-  respostas = [];
-  indicePerguntaAtual = 0;
-});
-
-// Botão de compartilhar resultados (adicionado dinamicamente)
-document.addEventListener('DOMContentLoaded', function() {
-  const btnCompartilhar = document.getElementById('btn-compartilhar');
-  if (btnCompartilhar) {
-    btnCompartilhar.addEventListener('click', () => {
-      let resumo = `Quiz Vocacional - Resultado para ${usuarioNome}:\n\n`;
-      resumo += "🎓 Cursos superiores recomendados:\n";
-      const cursosCards = document.querySelectorAll("#resultado-cursos .card");
-      cursosCards.forEach(card => {
-        const titulo = card.querySelector("h3")?.innerText || "";
-        resumo += `- ${titulo}\n`;
-      });
-      resumo += "\n🏛️ Cargos públicos recomendados:\n";
-      const cargosCards = document.querySelectorAll("#resultado-cargos .card");
-      cargosCards.forEach(card => {
-        const titulo = card.querySelector("h3")?.innerText || "";
-        resumo += `- ${titulo}\n`;
-      });
-      navigator.clipboard.writeText(resumo).then(() => {
-        alert("Resumo copiado para a área de transferência!");
-      }).catch(() => {
-        alert("Não foi possível copiar. Copie manualmente.");
-      });
-    });
-  }
-});
-
-// Adiciona evento de clique no botão compartilhar
-document.addEventListener('DOMContentLoaded', function() {
-  const shareBtn = document.getElementById('btn-compartilhar');
-  if (shareBtn) {
-    shareBtn.addEventListener('click', () => {
-      let resumo = `Quiz Vocacional - Resultado para ${usuarioNome || "usuário"}:\n\n`;
-      resumo += "🎓 Cursos superiores recomendados:\n";
-      document.querySelectorAll("#resultado-cursos .card h3").forEach(h3 => {
-        resumo += `- ${h3.innerText}\n`;
-      });
-      resumo += "\n🏛️ Cargos públicos recomendados:\n";
-      document.querySelectorAll("#resultado-cargos .card h3").forEach(h3 => {
-        resumo += `- ${h3.innerText}\n`;
-      });
-      navigator.clipboard.writeText(resumo).then(() => alert("Resumo copiado para área de transferência!")).catch(() => alert("Falha ao copiar."));
-    });
-  }
-});
-
-// ==================== TELA DE MATÉRIAS ====================
 const materiasLista = ["Matemática", "Português", "História", "Ciências", "Artes", "Tecnologia", "Filosofia", "Geografia", "Biologia", "Química", "Física", "Educação Física"];
 let notasMaterias = {};
 
 function carregarTelaMaterias() {
-  const container = document.getElementById("materias-container");
+  const container = document.getElementById('materias-container');
   if (!container) return;
   let html = "";
   materiasLista.forEach(materia => {
@@ -271,76 +148,130 @@ function carregarTelaMaterias() {
     </div>`;
   });
   container.innerHTML = html;
-  // Adiciona eventos para mostrar o valor atual
   materiasLista.forEach(materia => {
     const slider = document.getElementById(`nota_${materia}`);
     const span = document.getElementById(`valor_${materia}`);
-    slider.addEventListener("input", () => {
-      span.innerText = slider.value;
-    });
+    if (slider && span) slider.addEventListener("input", () => { span.innerText = slider.value; });
   });
 }
 
-// Substituir o comportamento do botão "Começar quiz"
-const btnIniciarOriginal = document.getElementById('btn-iniciar');
-if (btnIniciarOriginal) {
-  btnIniciarOriginal.addEventListener('click', () => {
+document.addEventListener('DOMContentLoaded', () => {
+  telaNome = document.getElementById('tela-nome');
+  telaPerguntas = document.getElementById('tela-perguntas');
+  telaResultado = document.getElementById('tela-resultado');
+  telaMaterias = document.getElementById('tela-materias');
+  nomeInput = document.getElementById('nome');
+  iniciarBtn = document.getElementById('btn-iniciar');
+  nomeUsuarioSpan = document.getElementById('nome-usuario');
+  perguntaContainer = document.getElementById('pergunta-container');
+  progressoTexto = document.getElementById('progresso-texto');
+  barraProgresso = document.getElementById('barra-progresso');
+  btnProximo = document.getElementById('btn-proximo');
+  btnConcluir = document.getElementById('btn-concluir');
+  resultadoNome = document.getElementById('resultado-nome');
+  resultadoCursosDiv = document.getElementById('resultado-cursos');
+  resultadoCargosDiv = document.getElementById('resultado-cargos');
+  btnReiniciar = document.getElementById('btn-reiniciar');
+
+  if (!iniciarBtn || !telaMaterias) {
+    console.error("Elementos essenciais não encontrados. Verifique o HTML.");
+    return;
+  }
+
+  iniciarBtn.addEventListener("click", () => {
     const nome = nomeInput.value.trim();
-    if (nome === '') {
-      alert('Por favor, digite seu nome.');
+    if (nome === "") {
+      alert("Por favor, digite seu nome.");
       return;
     }
     usuarioNome = nome;
     nomeUsuarioSpan.textContent = usuarioNome;
     resultadoNome.textContent = usuarioNome;
-    telaNome.style.display = 'none';
-    telaMaterias.style.display = 'block';
+    telaNome.style.display = "none";
+    telaMaterias.style.display = "block";
     carregarTelaMaterias();
   });
-}
 
-// Botão "Próximo" da tela de matérias
-document.getElementById('btn-proximo-materias')?.addEventListener('click', () => {
-  // Coleta as notas
-  materiasLista.forEach(materia => {
-    const slider = document.getElementById(`nota_${materia}`);
-    if (slider) notasMaterias[materia] = parseInt(slider.value);
-  });
-  // Armazena no localStorage ou em variável global
-  localStorage.setItem("preferenciasMaterias", JSON.stringify(notasMaterias));
-  // Avança para as perguntas
-  telaMaterias.style.display = 'none';
-  telaPerguntas.style.display = 'block';
-  // Inicializa o quiz (já existente)
-  respostas = new Array(perguntas.length).fill(undefined);
-  indicePerguntaAtual = 0;
-  btnProximo.style.display = 'inline-block';
-  btnConcluir.style.display = 'none';
-  carregarPergunta();
-});
-
-// Função para gerar texto de adequação com base nas notas das matérias
-function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
-  const pesos = window.disciplinasPesos?.[tipo]?.[cursoNome];
-  if (!pesos) return "";
-  const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
-  let feedback = "<p><strong>📖 Disciplinas mais exigidas:</strong><br>";
-  for (let [disc, peso] of Object.entries(pesos)) {
-    const notaUsuario = notas[disc] || 3; // padrão 3
-    let emoji = notaUsuario >= 4 ? "✅" : (notaUsuario <= 2 ? "⚠️" : "➖");
-    feedback += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
+  const btnProximoMaterias = document.getElementById('btn-proximo-materias');
+  if (btnProximoMaterias) {
+    btnProximoMaterias.addEventListener("click", () => {
+      materiasLista.forEach(materia => {
+        const slider = document.getElementById(`nota_${materia}`);
+        if (slider) notasMaterias[materia] = parseInt(slider.value);
+      });
+      localStorage.setItem("preferenciasMaterias", JSON.stringify(notasMaterias));
+      telaMaterias.style.display = "none";
+      telaPerguntas.style.display = "block";
+      respostas = new Array(perguntas.length).fill(undefined);
+      indicePerguntaAtual = 0;
+      btnProximo.style.display = "inline-block";
+      btnConcluir.style.display = "none";
+      carregarPergunta();
+    });
   }
-  feedback += "</p>";
-  return feedback;
-}
+  if (btnProximo) btnProximo.addEventListener('click', avancar);
+  if (btnConcluir) {
+    btnConcluir.addEventListener('click', () => {
+      if (respostas[indicePerguntaAtual] === undefined) {
+        alert("Responda a última pergunta.");
+        return;
+      }
+      gerarResultados();
+      telaPerguntas.style.display = 'none';
+      telaResultado.style.display = 'block';
+    });
+  }
+  if (btnReiniciar) {
+    btnReiniciar.addEventListener('click', () => {
+      telaResultado.style.display = 'none';
+      telaNome.style.display = 'block';
+      nomeInput.value = '';
+      respostas = [];
+      indicePerguntaAtual = 0;
+    });
+  }
 
-// Substituir a criação dos cards de cursos e cargos para incluir essa informação.
-// Como a função gerarResultados já existe, precisamos alterá-la.
-// Vamos fazer uma cópia e modificar com sed (mais seguro).
-// Mas, como o script é grande, faremos uma substituição direta.
-// Para evitar duplicação, anexamos um observador após o carregamento.
-// No entanto, o mais fácil é modificar a função original.
-// Vamos usar sed para inserir a chamada dentro do laço de cursos.
-// Como não quero arriscar quebrar, vou pedir que você execute um comando sed seguro.
-// O comando a seguir insere a linha dentro da criação do card de cursos.
+  const btnCompartilhar = document.getElementById('btn-compartilhar');
+  if (btnCompartilhar) btnCompartilhar.addEventListener('click', () => {
+    let resumo = `Quiz Vocacional - Resultado para ${usuarioNome || "usuário"}:\n\n`;
+    resumo += "🎓 Cursos superiores recomendados:\n";
+    document.querySelectorAll("#resultado-cursos .card h3").forEach(h3 => resumo += `- ${h3.innerText}\n`);
+    resumo += "\n🏛️ Cargos públicos recomendados:\n";
+    document.querySelectorAll("#resultado-cargos .card h3").forEach(h3 => resumo += `- ${h3.innerText}\n`);
+    navigator.clipboard.writeText(resumo).then(() => alert("Resumo copiado!")).catch(() => alert("Falha ao copiar."));
+  });
 
+  const whatsBtn = document.getElementById('btn-whatsapp');
+  if (whatsBtn) {
+    whatsBtn.addEventListener('click', () => {
+      const nome = usuarioNome || "Usuário";
+      const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
+      const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
+      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes no site`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+  }
+
+  const imgBtn = document.getElementById('btn-img');
+  if (imgBtn) {
+    imgBtn.addEventListener('click', async () => {
+      const el = document.querySelector('#tela-resultado');
+      if (!el) return alert("Nenhum resultado");
+      try {
+        imgBtn.innerText = "⏳";
+        imgBtn.disabled = true;
+        const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0a0f1c' });
+        const link = document.createElement('a');
+        link.download = 'resultado.png';
+        link.href = canvas.toDataURL();
+        link.click();
+        alert("Imagem salva!");
+      } catch (err) {
+        alert("Erro: " + err);
+      } finally {
+        imgBtn.innerText = "📸 Gerar Imagem";
+        imgBtn.disabled = false;
+      }
+    });
+  }
+});
