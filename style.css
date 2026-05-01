@@ -23,7 +23,7 @@ h1, h2 {
   margin-bottom: 1rem;
 }
 label {
-  display: block;
+  display: none;
   margin: 1rem 0 0.5rem;
   font-weight: bold;
 }

@@ -105,49 +105,6 @@ function calcularSimilaridade(perfilUsuario, perfilReferencia) {
   return Math.round(((cosseno + 1) / 2) * 100);
 }
 
-function gerarResultados() {
-  calcularPerfil();
-  let resultadosCursos = cursos.map(curso => {
-    let sim = calcularSimilaridade(pontuacoes, curso.perfil);
-    return { ...curso, similaridade: sim };
-  });
-  resultadosCursos.sort((a,b) => b.similaridade - a.similaridade);
-  resultadoCursosDiv.innerHTML = '<h2>🎓 Cursos superiores recomendados</h2>';
-  for (let i = 0; i < Math.min(20, resultadosCursos.length); i++) {
-    const c = resultadosCursos[i];
-    resultadoCursosDiv.innerHTML += `
-      <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cursos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
-        <p><strong>✅ Prós:</strong> ${c.pros}</p>
-        <p><strong>❌ Contras:</strong> ${c.contras}</p>
-        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
-        <p><strong>⏱️ Carga horária típica:</strong> ${c.cargaHoraria}</p>
-        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
-        <p><strong>💡 Mensagem:</strong> ${c.nome} pode oferecer ${c.tempoLivre.toLowerCase()} e exige dedicação, mas com planejamento é possível ter qualidade de vida.</p>
-      </div>
-    `;
-  }
-  let resultadosCargos = cargosPublicos.map(cargo => {
-    let sim = calcularSimilaridade(pontuacoes, cargo.perfil);
-    return { ...cargo, similaridade: sim };
-  });
-  resultadosCargos.sort((a,b) => b.similaridade - a.similaridade);
-  resultadoCargosDiv.innerHTML = '<h2>🏛️ Cargos públicos recomendados</h2>';
-  for (let i = 0; i < Math.min(20, resultadosCargos.length); i++) {
-    const c = resultadosCargos[i];
-    resultadoCargosDiv.innerHTML += `
-      <div class="card">
-        <h3>${c.nome} (${c.similaridade}% compatível)<span class="tooltip"> ℹ️<span class="tooltiptext">Disciplinas: ${(function(){ let html=""; const p = window.disciplinasPesos?.cargos?.[c.nome]; if(p) for(let [d,pes] of Object.entries(p)) html+=`${d}: ${pes}<br>`; return html;})()}</span></span></h3>
-        <p><strong>✅ Prós:</strong> ${c.pros}</p>
-        <p><strong>❌ Contras:</strong> ${c.contras}</p>
-        <p><strong>💰 Salário inicial:</strong> R$ ${c.salarioInicial.toLocaleString()} &nbsp; | &nbsp; <strong>Máximo:</strong> R$ ${c.salarioMaximo.toLocaleString()}</p>
-        <p><strong>⏱️ Jornada:</strong> ${c.cargaHoraria}</p>
-        <p><strong>🏠 Equilíbrio com família:</strong> ${c.vidaFamiliar}/10 &nbsp; | &nbsp; <strong>🧘 Vida saudável:</strong> ${c.saudavel}/10</p>
-        <p><strong>💡 Motivação:</strong> Este cargo permite ${c.tempoLivre.toLowerCase()}. Com disciplina, você constrói uma carreira estável e satisfatória.</p>
-      </div>
-    `;
-  }
-}
 
 iniciarBtn.addEventListener('click', () => {
   const nome = nomeInput.value.trim();
@@ -387,39 +344,3 @@ function getDisciplinasAdequacao(cursoNome, tipo = "cursos") {
 // Como não quero arriscar quebrar, vou pedir que você execute um comando sed seguro.
 // O comando a seguir insere a linha dentro da criação do card de cursos.
 
-document.addEventListener('DOMContentLoaded', function() {
-  const whatsBtn = document.getElementById('btn-whatsapp');
-  if (whatsBtn) {
-    whatsBtn.addEventListener('click', () => {
-      const nome = usuarioNome || "Usuário";
-      const cursos = Array.from(document.querySelectorAll("#resultado-cursos .card h3")).map(h => h.innerText).join(", ");
-      const cargos = Array.from(document.querySelectorAll("#resultado-cargos .card h3")).map(h => h.innerText).join(", ");
-      const msg = `*Quiz Vocacional* - Resultado para *${nome}*%0a%0a*🎓 Cursos:*%0a${cursos}%0a%0a*🏛️ Cargos:*%0a${cargos}%0a%0a📖 Detalhes no site`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    });
-  }
-});
-document.addEventListener('DOMContentLoaded', function() {
-  const imgBtn = document.getElementById('btn-img');
-  if (imgBtn) {
-    imgBtn.addEventListener('click', async () => {
-      const el = document.querySelector('#tela-resultado');
-      if (!el) return alert("Nenhum resultado");
-      try {
-        imgBtn.innerText = "⏳";
-        imgBtn.disabled = true;
-        const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0a0f1c' });
-        const link = document.createElement('a');
-        link.download = 'resultado.png';
-        link.href = canvas.toDataURL();
-        link.click();
-        alert("Imagem salva!");
-      } catch (err) {
-        alert("Erro: " + err);
-      } finally {
-        imgBtn.innerText = "📸 Gerar Imagem";
-        imgBtn.disabled = false;
-      }
-    });
-  }
-});
