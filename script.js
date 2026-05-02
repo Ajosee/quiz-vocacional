@@ -137,14 +137,15 @@ const materiasLista = ["Matemática", "Português", "História", "Ciências", "A
 let notasMaterias = {};
 
 function carregarTelaMaterias() {
-  const container = document.getElementById('materias-container');
+  const container = document.getElementById("materias-container");
   if (!container) return;
+  const materiasLista = ["Matemática", "Português", "História", "Ciências", "Artes", "Tecnologia", "Filosofia", "Geografia", "Biologia", "Química", "Física", "Educação Física"];
   let html = "";
   materiasLista.forEach(materia => {
-    html += `<div style="margin-bottom: 1rem;">
-      <label>${materia}: </label>
-      <input type="range" id="nota_${materia}" min="1" max="5" step="1" value="3" style="width: 60%;">
-      <span id="valor_${materia}">3</span>
+    html += `<div style="margin-bottom: 1rem; display: flex; align-items: center;">
+      <span style="width: 130px; font-weight: bold; color: #e0e0e0;">${materia}:</span>
+      <input type="range" id="nota_${materia}" min="1" max="5" step="1" value="3" style="flex: 1; margin: 0 1rem;">
+      <span id="valor_${materia}" style="width: 30px; text-align: center; color: #4caf50;">3</span>
     </div>`;
   });
   container.innerHTML = html;
