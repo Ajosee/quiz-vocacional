@@ -345,3 +345,50 @@ if (toggleBtn) {
     toggleBtn.innerText = '🌙 Modo Escuro';
   }
 }
+
+// Frase de direcionamento baseada no curso mais compatível
+function atualizarFraseDirecionamento() {
+  const container = document.getElementById('frase-direcionamento');
+  if (!container) return;
+  
+  const primeiroCurso = document.querySelector('#resultado-cursos .card h3');
+  if (!primeiroCurso) return;
+  
+  const nomeCurso = primeiroCurso.innerText.split('(')[0].trim();
+  let area = '';
+  let dica = '';
+  
+  // Personalize os blocos conforme seus cursos
+  if (nomeCurso.includes('Direito')) {
+    area = 'jurídica e humanidades';
+    dica = 'invista em leitura, argumentação e conhecimento da legislação';
+  } else if (nomeCurso.includes('Medicina')) {
+    area = 'saúde e biológicas';
+    dica = 'dedique-se à biologia, química e ao desenvolvimento da empatia';
+  } else if (nomeCurso.includes('Engenharia')) {
+    area = 'exatas e tecnologia';
+    dica = 'fortaleça seu raciocínio lógico, matemática e habilidades práticas';
+  } else if (nomeCurso.includes('Ciência da Computação') || nomeCurso.includes('Software')) {
+    area = 'tecnologia e programação';
+    dica = 'estude lógica de programação, algoritmos e mantenha-se atualizado';
+  } else if (nomeCurso.includes('Psicologia')) {
+    area = 'comportamento e saúde mental';
+    dica = 'desenvolva escuta ativa, ética e conhecimento em neurociência';
+  } else {
+    area = 'humanidades e sociais';
+    dica = 'valorize sua capacidade analítica, comunicação e senso crítico';
+  }
+  
+  const frase = `🔍 **Direcionamento:** Seu perfil tem forte afinidade com a área ${area}. Para se destacar, ${dica}. Continue explorando esse caminho!`;
+  container.innerHTML = `<p style="margin:0;">${frase}</p>`;
+}
+
+// Observar quando a tela de resultado se tornar visível
+const observadorFrase = new MutationObserver(() => {
+  const telaResultado = document.getElementById('tela-resultado');
+  if (telaResultado && telaResultado.style.display === 'block') {
+    setTimeout(atualizarFraseDirecionamento, 100);
+    observadorFrase.disconnect();
+  }
+});
+observadorFrase.observe(document.body, { attributes: true, childList: true, subtree: true });
