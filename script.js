@@ -277,3 +277,55 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 // força atualização
+
+// Função para gerar HTML das disciplinas mais exigidas
+function getDisciplinasAdequacao(itemNome, tipo) {
+  const pesos = window.disciplinasPesos?.[tipo]?.[itemNome];
+  if (!pesos) return "";
+  const notas = JSON.parse(localStorage.getItem("preferenciasMaterias") || "{}");
+  let html = '<p><strong>📖 Disciplinas mais exigidas:</strong><br>';
+  for (let [disc, peso] of Object.entries(pesos)) {
+    const notaUsuario = notas[disc] || 3;
+    let emoji = notaUsuario >= 4 ? "✅" : (notaUsuario <= 2 ? "⚠️" : "➖");
+    html += `${emoji} ${disc}: sua nota ${notaUsuario} (peso ${peso})<br>`;
+  }
+  html += '</p>';
+  return html;
+}
+
+// Função para adicionar bloco de disciplinas após os resultados serem exibidos
+function adicionarDisciplinasAposResultados() {
+  const cards = document.querySelectorAll('#resultado-cursos .card, #resultado-cargos .card');
+  cards.forEach(card => {
+    // Evita duplicar
+    if (card.querySelector('.disciplinas-wrapper')) return;
+    const titulo = card.querySelector('h3')?.innerText || '';
+    const nomeCurso = titulo.split('(')[0].trim();
+    const tipo = card.closest('#resultado-cursos') ? 'cursos' : 'cargos';
+    const pesos = window.disciplinasPesos?.[tipo]?.[nomeCurso];
+    if (!pesos) return;
+    const notas = JSON.parse(localStorage.getItem('preferenciasMaterias') || '{}');
+    let html = '<div class="disciplinas-wrapper" style="margin-top:0.8rem; border-left:3px solid #4caf50; background:#1e2a3a; padding:0.5rem; border-radius:0.5rem;">';
+    html += '<p><strong>📖 Disciplinas mais exigidas:</strong><br>';
+    for (let [disc, peso] of Object.entries(pesos)) {
+      const nota = notas[disc] || 3;
+      const emoji = nota >= 4 ? '✅' : (nota <= 2 ? '⚠️' : '➖');
+      html += `${emoji} ${disc}: sua nota ${nota} (peso ${peso})<br>`;
+    }
+    html += '</p></div>';
+    // Insere após a mensagem (último <p> antes do final do card)
+    const mensagemP = card.querySelector('p:last-of-type');
+    if (mensagemP) mensagemP.insertAdjacentHTML('afterend', html);
+    else card.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+// Observa quando a tela de resultado se tornar visível e adiciona as disciplinas
+const observerDisciplinas = new MutationObserver(() => {
+  const telaResultado = document.getElementById('tela-resultado');
+  if (telaResultado && telaResultado.style.display === 'block') {
+    setTimeout(() => adicionarDisciplinasAposResultados(), 100);
+    observerDisciplinas.disconnect();
+  }
+});
+observerDisciplinas.observe(document.body, { attributes: true, childList: true, subtree: true });
