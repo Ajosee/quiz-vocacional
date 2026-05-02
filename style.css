@@ -152,3 +152,47 @@ button#btn-reiniciar {
   opacity: 1;
 }
 #materias-container span { color: #e0e0e0; }
+
+/* Estilo suave para a seção de disciplinas (sem quebrar layout) */
+.card p:last-of-type {
+  background: rgba(30, 42, 58, 0.4);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-top: 0.8rem;
+  border-left: 3px solid #4caf50;
+}
+
+/* Tema claro */
+body.tema-claro {
+  background: #f0f0f0;
+  color: #1e2a3a;
+}
+body.tema-claro .container {
+  background: #ffffff;
+  color: #1e2a3a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+body.tema-claro h1, body.tema-claro h2 {
+  color: #2c7a4d;
+}
+body.tema-claro .card, body.tema-claro .simulador, body.tema-claro .pergunta, body.tema-claro .detalhe, body.tema-claro .resposta {
+  background: #e9ecef;
+  color: #1e2a3a;
+  border-color: #ced4da;
+}
+body.tema-claro .opcao {
+  background: #ffffff;
+  border-color: #ced4da;
+  color: #1e2a3a;
+}
+body.tema-claro .opcao.selected {
+  background: #4caf50;
+  color: white;
+}
+body.tema-claro button {
+  background: #4caf50;
+  color: white;
+}
+body.tema-claro button#btn-reiniciar {
+  background: #ff9800;
+}

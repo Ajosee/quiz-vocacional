@@ -22,7 +22,7 @@ function resetPontuacoes() { for (let key in areasMap) pontuacoes[key] = 0; }
 function carregarPergunta() {
   const p = perguntas[indicePerguntaAtual];
   let html = `<div class="pergunta"><p><strong>${p.texto}</strong></p><div class="opcoes">`;
-  const opcoesTexto = ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"];
+  const opcoesTexto = ["Não gosto nada", "Não gosto", "Indiferente", "Gosto", "Gosto muito"];
   for (let i = 0; i < opcoesTexto.length; i++) {
     const selected = (respostas[indicePerguntaAtual] === i) ? 'selected' : '';
     html += `<div class="opcao ${selected}" data-val="${i+1}">${opcoesTexto[i]}</div>`;
@@ -329,3 +329,19 @@ const observerDisciplinas = new MutationObserver(() => {
   }
 });
 observerDisciplinas.observe(document.body, { attributes: true, childList: true, subtree: true });
+
+// Alternância de tema (claro/escuro)
+const toggleBtn = document.getElementById('toggleTheme');
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('tema-claro');
+    toggleBtn.innerText = document.body.classList.contains('tema-claro') ? '🌙 Modo Escuro' : '🌓 Modo Claro';
+    localStorage.setItem('tema', document.body.classList.contains('tema-claro') ? 'claro' : 'escuro');
+  });
+  // Recuperar preferência salva
+  const temaSalvo = localStorage.getItem('tema');
+  if (temaSalvo === 'claro') {
+    document.body.classList.add('tema-claro');
+    toggleBtn.innerText = '🌙 Modo Escuro';
+  }
+}
