@@ -1,3 +1,4 @@
+// Copyright (c) 2025 Antonio Jose Brito da Silva. Todos os direitos reservados.
 // 25 perguntas (mesmo conteúdo, omitido por brevidade, mas mantenha igual ao que tinha)
 // Vou colocar um conteúdo mínimo funcional (com 20 cursos, 20 cargos e pesos)
 const perguntas = [

@@ -1,3 +1,4 @@
+// Copyright (c) 2025 Antonio Jose Brito da Silva. Todos os direitos reservados.
 // ==================== CONTROLE DO QUIZ ====================
 let usuarioNome = '';
 let respostas = [];
