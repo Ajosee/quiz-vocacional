@@ -399,11 +399,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Botão para gerar PDF (versão corrigida)
 document.addEventListener('DOMContentLoaded', function() {
+});
+
+// Botão para gerar PDF com múltiplas páginas
+document.addEventListener('DOMContentLoaded', function() {
+});
+
+// Botão para compartilhar via WhatsApp (texto com resumo)
+document.addEventListener('DOMContentLoaded', function() {
+});
+
+// Botão para baixar PDF (salvar arquivo)
+document.addEventListener('DOMContentLoaded', function() {
+});
+
+// Botão para baixar PDF com múltiplas páginas
+document.addEventListener('DOMContentLoaded', function() {
   const btnPdf = document.getElementById('btn-pdf');
   if (!btnPdf) return;
   
   btnPdf.addEventListener('click', async function() {
-    // Verificar se as bibliotecas estão carregadas
     if (typeof html2canvas === 'undefined') {
       alert("Biblioteca html2canvas não carregada.");
       return;
@@ -413,55 +428,54 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     const { jsPDF } = jspdf;
-    
     const nome = usuarioNome || "Usuário";
     const resultadoDiv = document.getElementById('tela-resultado');
     if (!resultadoDiv || resultadoDiv.style.display !== 'block') {
-      alert("Nenhum resultado visível. Complete o quiz primeiro.");
+      alert("Nenhum resultado visível.");
       return;
     }
     
-    // 1. Obter notas das matérias (localStorage)
+    // Inserir notas das matérias temporariamente
     const notasMaterias = JSON.parse(localStorage.getItem('preferenciasMaterias') || '{}');
     const materiasLista = ["Matemática", "Português", "História", "Ciências", "Artes", "Tecnologia", "Filosofia", "Geografia", "Biologia", "Química", "Física", "Educação Física"];
-    
-    // 2. Criar um elemento temporário para inserir as notas acima dos resultados
     const notasDiv = document.createElement('div');
     notasDiv.id = 'temp-notas-pdf';
     notasDiv.style.backgroundColor = '#f0f0f0';
-    notasDiv.style.padding = '10px';
+    notasDiv.style.padding = '12px';
     notasDiv.style.marginBottom = '20px';
     notasDiv.style.borderRadius = '8px';
-    notasDiv.style.border = '1px solid #ccc';
-    let htmlNotas = `<h3>📋 Notas atribuídas às disciplinas (1 a 5)</h3><table style="width:100%; border-collapse:collapse;">`;
+    let htmlNotas = `<h3>📋 Notas nas disciplinas (1 a 5)</h3><table style="width:100%; border-collapse:collapse;">`;
     materiasLista.forEach(materia => {
       const nota = notasMaterias[materia] || 3;
       htmlNotas += `<tr><td style="padding:4px;"><strong>${materia}</strong></td><td style="padding:4px;">${nota}</td></tr>`;
     });
     htmlNotas += `</table><hr>`;
     notasDiv.innerHTML = htmlNotas;
-    
-    // 3. Inserir o elemento no início da div de resultados (antes dos cards)
     resultadoDiv.insertBefore(notasDiv, resultadoDiv.firstChild);
     
-    // 4. Capturar a tela da área de resultados
     try {
-      const canvas = await html2canvas(resultadoDiv, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true
-      });
+      const canvas = await html2canvas(resultadoDiv, { scale: 2, backgroundColor: '#ffffff', logging: false });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
+      const imgWidth = 210; // mm
+      const pageHeight = 297; // mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      let heightLeft = imgHeight;
+      let position = 0;
+      
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
       pdf.save(`resultado_quiz_${nome.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+      alert("PDF gerado com sucesso!");
     } catch (err) {
       alert("Erro ao gerar PDF: " + err.message);
     } finally {
-      // Remover o elemento temporário
       if (notasDiv && notasDiv.parentNode) notasDiv.parentNode.removeChild(notasDiv);
     }
   });
